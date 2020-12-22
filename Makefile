@@ -1,4 +1,8 @@
 CMAKE = $(shell readlink -f $(firstword $(wildcard external/cmake-*/bin/cmake)))
+MAKE := $(MAKE) --no-print-directory
+
+TARGET ?= hw
+DEVICE ?= xilinx_u200_xdma_201830_2
 
 # Test target name (regex)
 NAME ?=
@@ -24,7 +28,7 @@ help:
 	@echo "## Vitis Build & Run ##"
 	@echo "make build  [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build xclbin and host code"
 	@echo "make device [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build xclbin"
-	@echo "make host   [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build host code"
+	@echo "make host                                                           ... Build host code"
 	@echo "make run    [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Run host code"
 	@echo
 	@echo "make help                                                           ... Show this help"
@@ -35,9 +39,13 @@ cmake:
 	@$(MAKE) --no-print-directory -C external cmake
 	@echo cmake path: $(CMAKE)
 
+.PHONY: cmake_conf
+cmake_conf: cmake
+	@mkdir -p build; cd build; $(CMAKE) ..
+
 .PHONY: cmake_build
-cmake_build: cmake
-	@mkdir -p build; cd build; $(CMAKE) .. ; make --no-print-directory
+cmake_build: cmake_conf
+	@cd build; $(MAKE)
 
 .PHONY: test
 test: cmake_build
@@ -60,38 +68,49 @@ csim_debug: cmake_build
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; env GTEST_COLOR=1 make $(NAME)_csim_debug
+	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME)_csim_debug
 
 .PHONY: cosim_debug
 cosim_debug: cmake_build
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; env GTEST_COLOR=1 make $(NAME)_cosim_debug
+	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME)_cosim_debug
 
 .PHONY: csyn
-csyn: cmake_build
+csyn: cmake_conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; make $(NAME)_csyn
+	@cd build ; $(MAKE) $(NAME)_csyn
 
 .PHONY: syn
-syn: cmake_build
+syn: cmake_conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; make $(NAME)_syn
+	@cd build ; $(MAKE) $(NAME)_syn
 
 .PHONY: impl
-impl: cmake_build
+impl: cmake_conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; make $(NAME)_impl
+	@cd build ; $(MAKE) $(NAME)_impl
+
+.PHONY: build
+build: device host
+
+.PHONY: device
+device: cmake_conf
+	@cd build; $(MAKE) device.${TARGET}.${DEVICE}
+
+.PHONY: host
+host: cmake_conf
+	@cd build; $(MAKE) host
 
 .PHONY: clean
 clean:
-	@$(MAKE) --no-print-directory -C external clean
+	@$(MAKE) -C external clean
 	rm -rf build
 

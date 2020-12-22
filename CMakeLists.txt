@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 enable_testing()
 
@@ -24,3 +24,5 @@ FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(kernel)
 add_subdirectory(test)
+add_subdirectory(device)
+add_subdirectory(host)
