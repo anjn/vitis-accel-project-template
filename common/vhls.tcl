@@ -12,6 +12,8 @@ set test_args [lindex $argv 12]
 
 regsub "cxxflags=" $cxxflags {} cxxflags
 regsub "ldflags=" $ldflags {} ldflags
+regsub -all ";" $cxxflags " " cxxflags
+regsub -all ";" $ldflags " " ldflags
 
 open_project -reset $name
 add_files -cflags "$cxxflags" $srcs

@@ -18,7 +18,7 @@ make impl NAME=<kernel name>                                        ... Run RTL-
 ## Vitis Build & Run ##
 make build  [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build xclbin and host code
 make device [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build xclbin
-make host   [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Build host code
+make host                                                           ... Build host code
 make run    [TARGET=<sw_emu|hw_emu|hw>] [DEVICE=<alveo platform>]   ... Run host code
 
 make help                                                           ... Show this help
