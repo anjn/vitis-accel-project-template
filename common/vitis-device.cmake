@@ -1,4 +1,7 @@
+add_custom_target(xclbin)
+
 function(add_xclbin NAME KERNEL_SRCS KERNEL_INCLUDE_DIRS VPP_FLAGS VPP_COMPILE_FLAGS VPP_LINK_FLAGS VPP_COMPILE_CONFIGS VPP_LINK_CONFIGS DEVICE)
+
   # TODO
   set(KERNEL_DEPENDENCIES)
   foreach(DIR IN LISTS KERNEL_INCLUDE_DIRS)
@@ -26,24 +29,35 @@ function(add_xclbin NAME KERNEL_SRCS KERNEL_INCLUDE_DIRS VPP_FLAGS VPP_COMPILE_F
         COMMAND echo Compile flags: ${VPP_FLAGS} ${VPP_COMPILE_FLAGS}
         COMMAND v++ --compile --target ${TARGET} --platform ${DEVICE} --kernel ${KERNEL_NAME} ${KERNEL_SRCS} -o ${KERNEL_XO} --temp_dir _x.${TARGET}.${DEVICE} --save-temps --log_dir _x.${TARGET}.${DEVICE}/logs ${VPP_FLAGS} ${VPP_COMPILE_FLAGS}
         MAIN_DEPENDENCY ${KERNEL_SRC}
-        DEPENDS ${KERNEL_DEPENDENCIES}
+        DEPENDS ${KERNEL_DEPENDENCIES} ${VPP_COMPILE_CONFIGS}
         )
       list(APPEND KERNEL_XOS ${KERNEL_XO})
     endforeach()
     
-    set(XCLBIN ${NAME}.${TARGET}.${DEVICE}.xclbin)
+    set(XCLBIN ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.${TARGET}.${DEVICE}.xclbin)
     
     add_custom_command(
       OUTPUT ${XCLBIN}
       COMMAND echo Link flags: ${VPP_FLAGS} ${VPP_LINK_FLAGS}
       COMMAND v++ --link --target ${TARGET} --platform ${DEVICE} -o ${XCLBIN} ${KERNEL_XOS} ${VPP_FLAGS} ${VPP_LINK_FLAGS}
-      MAIN_DEPENDENCY ${KERNEL_XOS}
+      DEPENDS ${KERNEL_XOS} ${VPP_LINK_CONFIGS}
       )
     
     add_custom_target(
-      device.${TARGET}.${DEVICE}
+      xclbin.${TARGET}.${DEVICE}
       SOURCES ${XCLBIN}
       )
+    set_target_properties(
+      xclbin.${TARGET}.${DEVICE}
+      PROPERTIES
+        LOCATION ${XCLBIN}
+        TARGET ${TARGET}
+        DEVICE ${DEVICE}
+      )
   endforeach()
-endfunction()
 
+  # Devices
+  get_property(DEVICES TARGET xclbin PROPERTY DEVICES)
+  list(APPEND DEVICES ${DEVICE})
+  set_target_properties(xclbin PROPERTIES DEVICES ${DEVICES})
+endfunction()

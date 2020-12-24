@@ -34,9 +34,13 @@ help:
 	@echo "make help                                                           ... Show this help"
 	@echo
 
+.PHONY: download
+download:
+	@$(MAKE) -C external download
+
 .PHONY: cmake
 cmake:
-	@$(MAKE) --no-print-directory -C external cmake
+	@$(MAKE) -C external cmake
 	@echo cmake path: $(CMAKE)
 
 .PHONY: cmake_conf
@@ -108,6 +112,10 @@ device: cmake_conf
 .PHONY: host
 host: cmake_conf
 	@cd build; $(MAKE) host
+
+.PHONY: run
+run: cmake_conf
+	@cd build; $(MAKE) run.${TARGET}.${DEVICE}
 
 .PHONY: clean
 clean:

@@ -14,7 +14,7 @@ set(VPP_COMPILE_FLAGS
 set(VPP_LINK_FLAGS
   )
 
-# .ini files
+# .ini files for --config option
 set(VPP_COMPILE_CONFIGS
   )
 set(VPP_LINK_CONFIGS
@@ -31,4 +31,3 @@ add_xclbin(
   "${VPP_LINK_CONFIGS}"
   xilinx_u200_xdma_201830_2
   )
-
