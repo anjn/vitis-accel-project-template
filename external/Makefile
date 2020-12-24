@@ -3,7 +3,7 @@ CMAKE_TAR_GZ  := cmake-3.16.8-Linux-x86_64.tar.gz
 CMAKE_DIR     := cmake-3.16.8-Linux-x86_64
 CMAKE_BIN     := $(CMAKE_DIR)/bin/cmake
 DOWNLOADS     += $(CMAKE_TAR_GZ)
-TARGETS       += $(CMAKE_BIN)
+TARGETS       += $(CMAKE_DIR) $(CMAKE_BIN)
 
 $(CMAKE_TAR_GZ):
 	wget https://github.com/Kitware/CMake/releases/download/v3.16.8/cmake-3.16.8-Linux-x86_64.tar.gz
