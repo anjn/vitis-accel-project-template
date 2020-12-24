@@ -1,4 +1,3 @@
-CMAKE = $(shell readlink -f $(firstword $(wildcard external/cmake-*/bin/cmake)))
 MAKE := $(MAKE) --no-print-directory
 
 TARGET ?= hw
@@ -38,13 +37,13 @@ help:
 download:
 	@$(MAKE) -C external download
 
-.PHONY: cmake
-cmake:
+build/cmake.mk:
 	@$(MAKE) -C external cmake
-	@echo cmake path: $(CMAKE)
+	@mkdir -p build
+	@echo 'CMAKE = $$(shell readlink -f $$(firstword $$(wildcard external/cmake-*/bin/cmake)))' > $@
 
 .PHONY: cmake_conf
-cmake_conf: cmake
+cmake_conf:
 	@mkdir -p build; cd build; $(CMAKE) ..
 
 .PHONY: cmake_build
@@ -120,5 +119,11 @@ run: cmake_conf
 .PHONY: clean
 clean:
 	@$(MAKE) -C external clean
-	rm -rf build
+	@rm -rf build
 
+.PHONY: ultraclean
+ultraclean: clean
+	@test -e .git && git clean -dfX || true
+	@test -e .git && git clean -df || true
+
+-include build/cmake.mk

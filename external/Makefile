@@ -33,5 +33,5 @@ download: $(DOWNLOADS)
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGETS) $(DOWNLOADS)
+	@rm -rf $(TARGETS)
 
