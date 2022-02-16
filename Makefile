@@ -42,16 +42,16 @@ build/cmake.mk:
 	@mkdir -p build
 	@echo 'CMAKE = $$(shell readlink -f $$(firstword $$(wildcard external/cmake-*/bin/cmake)))' > $@
 
-.PHONY: cmake_conf
-cmake_conf:
+.PHONY: cmake-conf
+cmake-conf:
 	@mkdir -p build; cd build; $(CMAKE) ..
 
-.PHONY: cmake_build
-cmake_build: cmake_conf
+.PHONY: cmake-build
+cmake-build: cmake-conf
 	@cd build; $(MAKE)
 
 .PHONY: test
-test: cmake_build
+test: cmake-build
 ifeq ($(NAME),)
 	@cd build ; env CTEST_OUTPUT_ON_FAILURE=1 GTEST_COLOR=1 ctest -V -j $(JOBS) -R unit_tests
 else
@@ -59,61 +59,61 @@ else
 endif
 
 .PHONY: csim
-csim: cmake_build
+csim: cmake-build
 	@cd build ; env CTEST_OUTPUT_ON_FAILURE=1 GTEST_COLOR=1 ctest -V -j $(JOBS) -R "$(NAME).*csim"
 
 .PHONY: cosim
-cosim: cmake_build
+cosim: cmake-build
 	@cd build ; env CTEST_OUTPUT_ON_FAILURE=1 GTEST_COLOR=1 ctest -V -j $(JOBS) -R "$(NAME).*cosim"
 
 .PHONY: csim_debug
-csim_debug: cmake_build
+csim_debug: cmake-build
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME)_csim_debug
+	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME).csim_debug
 
 .PHONY: cosim_debug
-cosim_debug: cmake_build
+cosim_debug: cmake-build
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME)_cosim_debug
+	@cd build ; env GTEST_COLOR=1 $(MAKE) $(NAME).cosim_debug
 
 .PHONY: csyn
-csyn: cmake_conf
+csyn: cmake-conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; $(MAKE) $(NAME)_csyn
+	@cd build ; $(MAKE) $(NAME).csyn
 
 .PHONY: syn
-syn: cmake_conf
+syn: cmake-conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; $(MAKE) $(NAME)_syn
+	@cd build ; $(MAKE) $(NAME).syn
 
 .PHONY: impl
-impl: cmake_conf
+impl: cmake-conf
 ifeq ($(NAME),)
 	$(error NAME is not specified!)
 endif
-	@cd build ; $(MAKE) $(NAME)_impl
+	@cd build ; $(MAKE) $(NAME).impl
 
 .PHONY: build
 build: device host
 
 .PHONY: device
-device: cmake_conf
-	@cd build; $(MAKE) device.${TARGET}.${DEVICE}
+device: cmake-conf
+	@cd build; $(MAKE) xclbin.${TARGET}.${DEVICE}
 
 .PHONY: host
-host: cmake_conf
+host: cmake-conf
 	@cd build; $(MAKE) host
 
 .PHONY: run
-run: cmake_conf
+run: cmake-conf
 	@cd build; $(MAKE) run.${TARGET}.${DEVICE}
 
 .PHONY: clean
